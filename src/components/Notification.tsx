@@ -25,6 +25,7 @@ const Notification: React.FC<NotificationProps> = ({ message }) => {
       if (message === 'BOIII') {
         toast.success(message, { position: 'top-center', autoClose: 5000 });
       } else if (message === 'REPOST!!!') {
+        toast.dismiss();
         toast.error(`REPOST! YOU GET 1 MINUTE TIMEOUT`, {
           position: 'top-center',
           autoClose: 60000,
