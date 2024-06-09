@@ -85,22 +85,20 @@ const handleKeyPress = async (key: string) => {
 
             setGuesses([...guesses, currentGuess]);
             setCurrentGuess('');
-          }
 
+            const currentGuessLetters = new Set(currentGuess);
+            const newAbsentLetters = new Set(absentLetters);
+            currentGuessLetters.forEach(letter => {
+              if (!solution.includes(letter)) {
+                newAbsentLetters.add(letter);
+              }
+            });
+            setAbsentLetters(newAbsentLetters);
+          }
         }
         if (guesses.length + 1 >= (solution.length > 5 ? 8 : 5)) {
-          // print unboii if the user has reached the limit of guesses and also print the correct solution in the same notification but keep the nope-like string too,
           newNotification = `${newNotification}, UNBOII. The word was ${solution}`;
         }
-                  // Update absent letters
-          const currentGuessLetters = new Set(currentGuess);
-          const newAbsentLetters = new Set(absentLetters);
-          currentGuessLetters.forEach(letter => {
-            if (!solution.includes(letter)) {
-              newAbsentLetters.add(letter);
-            }
-          });
-          setAbsentLetters(newAbsentLetters);
       }
       setNotification(newNotification);
     }
