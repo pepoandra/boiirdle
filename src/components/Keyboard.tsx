@@ -5,6 +5,7 @@ import 'react-simple-keyboard/build/css/index.css';
 
 interface CustomKeyboardProps {
   onKeyPress: (key: string) => void;
+  absentLetters: Set<string>;
 }
 
 const KeyboardContainer = styled.div`
@@ -13,7 +14,12 @@ const KeyboardContainer = styled.div`
   max-width: 600px;
 `;
 
-const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onKeyPress }) => {
+const AbsentKey = styled.div`
+  background-color: #d3d3d3 !important; /* Light gray */
+  color: #000000 !important; /* Black text */
+`;
+
+const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onKeyPress, absentLetters }) => {
   const handleKeyPress = (button: string) => {
     if (button === '{enter}') {
       onKeyPress('ENTER');
@@ -30,7 +36,7 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onKeyPress }) => {
         onKeyPress('ENTER');
       } else if (event.key === 'Backspace') {
         onKeyPress('DEL');
-      } else if (/^[a-zA-Z]$/.test(event.key)) {
+      } else if (/^[a-zA-Z]$/.test(event.key) && !event.getModifierState('CapsLock')) {
         onKeyPress(event.key.toUpperCase());
       }
     };
@@ -42,8 +48,24 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onKeyPress }) => {
     };
   }, [onKeyPress]);
 
+  const getButtonTheme = () => {
+    const absentButtonTheme = Array.from(absentLetters).map(letter => ({
+      class: 'absent',
+      buttons: letter.toUpperCase(),
+    }));
+    return absentButtonTheme;
+  };
+
   return (
     <KeyboardContainer>
+      <style>
+        {`
+          .absent {
+            background-color: #d3d3d3 !important;
+            color: #000000 !important;
+          }
+        `}
+      </style>
       <Keyboard
         onKeyPress={handleKeyPress}
         layout={{
@@ -58,6 +80,7 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = ({ onKeyPress }) => {
           '{bksp}': 'DEL',
           '{enter}': 'ENTER'
         }}
+        buttonTheme={getButtonTheme()}
         physicalKeyboardHighlight={true}
         physicalKeyboardHighlightPress={true}
       />

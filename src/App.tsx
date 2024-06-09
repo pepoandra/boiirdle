@@ -37,6 +37,7 @@ const App: React.FC = () => {
   const [notification, setNotification] = useState<string>('');
   const [solution, setSolution] = useState<string>(words[Math.floor(Math.random() * words.length)]);
   const [isBlocked, setIsBlocked] = useState<boolean>(false);
+  const [absentLetters, setAbsentLetters] = useState<Set<string>>(new Set());
 
 
 const checkWordExists = async (word: string) => {
@@ -88,8 +89,18 @@ const handleKeyPress = async (key: string) => {
 
         }
         if (guesses.length + 1 >= (solution.length > 5 ? 8 : 5)) {
-          newNotification = newNotification ? `${newNotification}, UNBOII` : 'UNBOII';
+          // print unboii if the user has reached the limit of guesses and also print the correct solution in the same notification but keep the nope-like string too,
+          newNotification = `${newNotification}, UNBOII. The word was ${solution}`;
         }
+                  // Update absent letters
+          const currentGuessLetters = new Set(currentGuess);
+          const newAbsentLetters = new Set(absentLetters);
+          currentGuessLetters.forEach(letter => {
+            if (!solution.includes(letter)) {
+              newAbsentLetters.add(letter);
+            }
+          });
+          setAbsentLetters(newAbsentLetters);
       }
       setNotification(newNotification);
     }
@@ -108,6 +119,7 @@ const handleKeyPress = async (key: string) => {
     setGuesses([]);
     setCurrentGuess('');
     setNotification('');
+    setAbsentLetters(new Set()); // Reset absent letters
     setSolution(words[Math.floor(Math.random() * words.length)]);
     (document.activeElement as HTMLElement).blur(); // This will remove focus from the reset button
   };
@@ -117,7 +129,7 @@ const handleKeyPress = async (key: string) => {
       <GlobalStyles />
       <Banner />
       <Board guesses={guesses} currentGuess={currentGuess} solution={solution} />
-      <Keyboard onKeyPress={handleKeyPress} />
+      <Keyboard onKeyPress={handleKeyPress} absentLetters={absentLetters} />
       <Notification message={notification} />
       <ResetButton onClick={resetGame}>Reset Game</ResetButton>
     </AppContainer>
